@@ -3,6 +3,15 @@ const CLICOLOR = require('cli-color')
 
 const R = require('ramda')
 
+/**
+ * Add a repositry that corresponds to the Redis number of table.
+ */
+const REPOSITORIES = {
+  cats: 0,
+  dogs: 1,
+  // ... whatever
+}
+
 const trace = (x, ...comment) =>
   IO(() => console.log(x, ...comment))
     .takeRight(IO(() => x))
@@ -12,15 +21,6 @@ const redisError = (err, req, res, next) =>
   res.headersSent
     ? next(err)
     : res.status(500)
-
-/**
- * Add a repositry that corresponds to the Redis number of table.
- */
-const repositories = {
-  cats: 0,
-  dogs: 1,
-  // ... whatever
-}
 
 /**
  * 
@@ -34,7 +34,11 @@ const extractVersioned = (reply, versionID) => {
       .filter(versionedObj => !R.isNil(R.prop(versionID, versionedObj)))
       .pop()[versionID]
 
-    return { oid: oid, version: Number(version), size: Number(size) }
+    return consistentObject = {
+      oid: oid,
+      version: Number(version),
+      size: Number(size)
+    }
   } catch (e) {
     trace(CLICOLOR.red('\nNo version found.\n'))
   }
@@ -53,7 +57,7 @@ const extractAllVersions = (reply) =>
 module.exports = {
   trace,
   redisError,
-  repositories,
+  REPOSITORIES,
   extractVersioned,
   extractAllVersions,
 }
