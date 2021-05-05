@@ -1,7 +1,7 @@
 const { IO } = require("monet")
-const CLICOLOR = require('cli-color')
 
 const R = require('ramda')
+const CLICOLOR = require('cli-color')
 
 /**
  * Add a repositry that corresponds to the Redis number of table.
@@ -40,7 +40,7 @@ const extractVersioned = (reply, versionID) => {
       size: Number(size)
     }
   } catch (e) {
-    trace(CLICOLOR.red('\nNo version found.\n'))
+    trace(CLICOLOR.red('No version found.'))
   }
 }
 
@@ -49,10 +49,15 @@ const extractVersioned = (reply, versionID) => {
  * @param {String} reply String obtained from Redis
  * @returns Array of all object versions
  */
-const extractAllVersions = (reply) =>
-  reply
-    .match(/[^|.+]+/g)
-    .map(stringifiedObj => JSON.parse(stringifiedObj))
+const extractAllVersions = (reply) => {
+  try {
+    return reply
+      .match(/[^|.+]+/g)
+      .map(stringifiedObj => JSON.parse(stringifiedObj))
+  } catch (e) {
+    trace(CLICOLOR.red('No object found.'))
+  }
+}
 
 module.exports = {
   trace,

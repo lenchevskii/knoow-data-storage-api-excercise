@@ -5,9 +5,6 @@ const supertest = require('supertest')
 const server = require('./server.js')
 
 test('data-storage-api-node', async () => {
-  // await supertest(server)
-  //   .get('/')
-  //   .expect(200)
   
   // PUT
   const putResult = await supertest(server)
@@ -31,6 +28,7 @@ test('data-storage-api-node', async () => {
     .delete(`/data/cats/${hash}`)
     .expect(200)
 
+  // NOT FOUND
   await supertest(server)
     .get(`/data/cats/${hash}`)
     .expect(404)

@@ -1,32 +1,40 @@
-const { extractVersioned, extractAllVersions } = require('./general-helpers')
+const { extractVersioned, extractAllVersions, trace } = require('./general-helpers')
 
 const R = require('ramda')
 
 const GETcallbackVersioned =
   (versionID, response, error, reply) =>
-    !R.isNil(error) || R.isNil(extractVersioned(reply, versionID))
+    error || R.isNil(extractVersioned(reply, versionID))
       ? response.sendStatus(404)
       : response.status(200)
         .send(extractVersioned(reply, versionID))
 
 const GETcallbackAll =
   (response, error, reply) =>
-    !R.isNil(error)
-      ? IO(() => response.sendStatus(404))
-        .takeRight(IO(() => trace(CLICOLOR.red('\nNo object found.\n'))))
-        .run()
+    error || R.isNil(extractAllVersions(reply))
+      ? response.sendStatus(404)
       : response.status(200)
-        .send(extractAllVersions(reply))
+        .send(
+          R.head(extractAllVersions(reply))['name']
+        )
 
 const SETcallback =
   (consistentObject, response, error, reply) =>
     error
-      ? response.send(error)
+      ? response.sendStatus(404)
       : response.status(201).send(consistentObject)
 
-// Function name ends with 'C' means it uses in a curried version
+
+const DELcallback =
+  (response, error, reply) =>
+    error
+      ? response.sendStatus(404)
+      : response.sendStatus(200)
+
 module.exports = {
-  SETcallbackC: R.curry(SETcallback),
-  GETcallbackAllC: R.curry(GETcallbackAll),
-  GETcallbackVersionedC: R.curry(GETcallbackVersioned),
+  SETcallback: R.curry(SETcallback),
+  DELcallback: R.curry(DELcallback),
+  APPENDcallback: R.curry(SETcallback),
+  GETcallbackAll: R.curry(GETcallbackAll),
+  GETcallbackVersioned: R.curry(GETcallbackVersioned),
 }
