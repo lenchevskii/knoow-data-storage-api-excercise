@@ -30,14 +30,15 @@ const redisError = (err, req, res, next) =>
  */
 const extractVersioned = (reply, versionID) => {
   try {
-    const { oid, version, size } = extractAllVersions(reply)
+    const { oid, version, size, name } = extractAllVersions(reply)
       .filter(versionedObj => !R.isNil(R.prop(versionID, versionedObj)))
       .pop()[versionID]
 
     return consistentObject = {
       oid: oid,
       version: Number(version),
-      size: Number(size)
+      size: Number(size),
+      name: name
     }
   } catch (e) {
     trace(CLICOLOR.red('No version found.'))
